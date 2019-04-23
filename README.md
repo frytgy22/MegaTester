@@ -23,11 +23,11 @@ Project - it is REST service for:
 	- /{accountId} **GET** (text/event-stream) - Server Side Events for receiving stream of the events
 
 ### Users
-| Username   | Password | Roles | AccountId |
-|------------|----------|-------|-----------|
-| admin      | password | ADMIN | -1        |
-| user1      | user1    | USER  | 1         |
-| user2      | user2    | USER  | 2         |
+| Username   | Password | Roles      | AccountId |
+|------------|----------|------------|-----------|
+| admin      | password | ROLE_ADMIN | -1        |
+| user1      | user1    | ROLE_USER  | 1         |
+| user2      | user2    | ROLE_USER  | 2         |
 
 ### Workflow of the application
 Orders:
@@ -63,7 +63,6 @@ Recommendation:
 
  	
 #//TODO:
-- roles
 - split to separate jars
 - tests
 - validation
@@ -71,3 +70,4 @@ Recommendation:
 	- balance
 - notifications - update
 - start balance
+- update readme endpoints

@@ -2,6 +2,7 @@ package ua.test.mega.MegaTester.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,12 +25,16 @@ public class NotificationRestController {
 		this.notificationProcessor = notificationProcessor;
 	}
 
-	@GetMapping(path = "/{accountId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<NotificationDTO> getNotifications() {
+	@GetMapping(path = "/", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<NotificationDTO> getNotificationsForLoggedInUser() {
+		return notificationProcessor.provideNotificationsForLoggedinUser()
+				.map(this::toNotificationDTO);
+	}
 
-		Flux<Notification> notifications = notificationProcessor.provideNotificationsForLoggedinUser();
-
-		return notifications
+	@Secured("ROLE_ADMIN")
+	@GetMapping(path = "/all", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<NotificationDTO> getAllNotifications() {
+		return notificationProcessor.provideAllNotifications()
 				.map(this::toNotificationDTO);
 	}
 

@@ -28,15 +28,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth, UserAdapter userAdapter) throws Exception {
-		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> authenticationManagerBuilderInMemoryUserDetailsManagerConfigurer =
+		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> authenticationManagerBuilder =
 				auth.inMemoryAuthentication()
 						.passwordEncoder(NoOpPasswordEncoder.getInstance());
 
 		for (User user : userAdapter.getAllUsers()) {
-			authenticationManagerBuilderInMemoryUserDetailsManagerConfigurer
+			authenticationManagerBuilder = authenticationManagerBuilder
 					.withUser(user.getUsername())
 					.password(user.getPassword())
-					.roles((String[])user.getRoles().toArray());
+					.roles((String[])user.getRoles().toArray())
+					.and();
 		}
 	}
 }

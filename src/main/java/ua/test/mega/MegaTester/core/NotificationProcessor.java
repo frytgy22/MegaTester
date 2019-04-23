@@ -36,4 +36,8 @@ public class NotificationProcessor {
 	private boolean isNotificationForUser(Notification notification, long accountId) {
 		return NotificationType.USER == notification.getType() && notification.getUserId() == accountId;
 	}
+
+	public Flux<Notification> provideAllNotifications() {
+		return notificationAdapter.provideNotificationStream();
+	}
 }
