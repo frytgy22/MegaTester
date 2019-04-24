@@ -50,8 +50,8 @@ Orders:
 
 Recommendation:
 - use give-when-then approach
-- use mockito
-- other frameworks can be used
+- write some tests with mockito and without
+- other test frameworks can be used
 
 ### Integration tests
 - Test rest points 
@@ -63,7 +63,6 @@ Recommendation:
 
  	
 #//TODO:
-- split to separate jars
 - tests
 - validation
 	- parameters
