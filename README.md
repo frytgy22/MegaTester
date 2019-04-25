@@ -65,9 +65,5 @@ Recommendation:
 - use REST Assured framework
 - automate login in tests (own runner or rules)
 - split tests to groups, depend from processor
- 	
-#//TODO:
-- validation
-	- parameters
-	- balance
-- notifications - update
+
+

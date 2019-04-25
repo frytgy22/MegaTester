@@ -35,7 +35,7 @@ public class PositionAdapterInMemory implements PositionAdapter {
 				.build();
 
 		positions.computeIfAbsent(position.getAccountId(), accountId -> new ArrayList<>())
-			.add(positionForSave);
+				.add(positionForSave);
 
 		return positionForSave;
 	}

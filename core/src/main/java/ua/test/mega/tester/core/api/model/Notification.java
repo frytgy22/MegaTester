@@ -17,4 +17,8 @@ public class Notification {
 	private final long userId;
 
 	private final Throwable error;
+
+	private final long orderId;
+
+	private final long positionId;
 }

@@ -16,7 +16,6 @@ import ua.test.mega.tester.core.exceptions.UnauthorizedRequestException;
 @Component
 public class LoggedInUserAdapterForSpringSecurity implements LoggedInUserAdapter {
 
-
 	private final UserAdapter userAdapter;
 	private final Map<String, User> users = new ConcurrentHashMap<>();
 
@@ -37,11 +36,10 @@ public class LoggedInUserAdapterForSpringSecurity implements LoggedInUserAdapter
 		return users.computeIfAbsent(loggedInUsername, userAdapter::find);
 	}
 
-
 	private String getLoggedInUsername() {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (principal instanceof UserDetails) {
-			return  ((UserDetails)principal).getUsername();
+			return ((UserDetails) principal).getUsername();
 		} else {
 			return principal.toString();
 		}

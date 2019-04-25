@@ -29,11 +29,11 @@ public class UserAdapterInMemory implements UserAdapter {
 
 	private User newUser(String username, String password, int accountId, List<String> roles) {
 		return User.builder()
-					.username(username)
-					.password(password)
-					.accountId(accountId)
-					.roles(roles)
-					.build();
+				.username(username)
+				.password(password)
+				.accountId(accountId)
+				.roles(roles)
+				.build();
 	}
 
 	@Override

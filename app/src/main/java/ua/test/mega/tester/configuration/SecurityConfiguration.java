@@ -36,7 +36,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			authenticationManagerBuilder = authenticationManagerBuilder
 					.withUser(user.getUsername())
 					.password(user.getPassword())
-					.roles((String[])user.getRoles().toArray())
+					.roles((String[]) user.getRoles().toArray())
 					.and();
 		}
 	}
