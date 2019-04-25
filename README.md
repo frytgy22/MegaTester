@@ -1,9 +1,7 @@
 # Mega tester
-
 Project created for improving skills for writing tests and checking the quality of the knowledge.
 
 ## About project
-
 Application - is REST service for:
  - execution order
  - receiving positions based on orders
@@ -42,7 +40,17 @@ Orders:
 	- update account balance according opened position
 	- take fee for opening position
 	- notify all about update 
-	  
+
+## How to run
+
+* Go to the app  folder in project 
+> cd MegaTester/app
+* Run springboot application 
+> mvn spring-boot:run
+* And open in browser: 
+> http://localhost:8080/api/account/
+
+
 
 #Tasks:
 ### Unit tests
