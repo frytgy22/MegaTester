@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import ua.test.mega.tester.core.api.LoggedInUserAdapter;
 import ua.test.mega.tester.core.api.UserAdapter;
 import ua.test.mega.tester.core.api.model.User;
+import ua.test.mega.tester.core.exceptions.UnauthorizedRequestException;
 
 @Component
 public class LoggedInUserAdapterForSpringSecurity implements LoggedInUserAdapter {
@@ -28,6 +29,10 @@ public class LoggedInUserAdapterForSpringSecurity implements LoggedInUserAdapter
 	public User getLoggedInUser() {
 
 		String loggedInUsername = getLoggedInUsername();
+
+		if (null == loggedInUsername) {
+			throw new UnauthorizedRequestException();
+		}
 
 		return users.computeIfAbsent(loggedInUsername, userAdapter::find);
 	}
