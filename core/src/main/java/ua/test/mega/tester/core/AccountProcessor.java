@@ -1,5 +1,7 @@
 package ua.test.mega.tester.core;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,5 +29,13 @@ public class AccountProcessor {
 
 	public Account loadAccountInfo(long accountId) {
 		return accountAdapter.find(accountId);
+	}
+
+	public BigDecimal deposit(long accountId, BigDecimal amount) {
+		return accountAdapter.updateBalance(accountId, amount);
+	}
+
+	public BigDecimal withdrawal(long accountId, BigDecimal amountInUSD) {
+		return accountAdapter.updateBalance(accountId, amountInUSD.negate());
 	}
 }

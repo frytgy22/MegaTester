@@ -4,23 +4,28 @@ Project created for improving skills for writing tests and checking the quality 
 
 ## About project
 
-Project - it is REST service for:
+Application - is REST service for:
  - execution order
- - receiving positions based on order
+ - receiving positions based on orders
  - updating account on order execution
  - and notification about events in system
  
  ### Entry points
- 
-- /api/order/
+ - /api/order/
 	- **GET** - return all available orders
  	- **POST** - register new order and run workflow for creating position and calculation of the account changes
 - /api/position/
 	- **GET** - return all available positions for user
 - /api/account/
+	- / **GET** - receiving logged in user account
 	- /{accountId} **GET** - receiving account by account id
+	- /{accountId}/deposit/{amountInUSD} - for deposit to user account. Return new balance
+	- /{accountId}/deposit/{amountInUSD} - for withdrawal from user account. Return new balance
 - /api/notification/
-	- /{accountId} **GET** (text/event-stream) - Server Side Events for receiving stream of the events
+	- /{accountId} **GET** (text/event-stream) - Server Side Events for receiving stream of the events for logged in user
+	- /all **GET** (text/event-stream) - Server Side Events for receiving stream of the all events
+
+Note: some entry points have restriction by roles.
 
 ### Users
 | Username   | Password | Roles      | AccountId |
@@ -41,7 +46,7 @@ Orders:
 
 #Tasks:
 ### Unit tests
-- Test core processors with mocks
+- Test core
 	- OrderManagementProcessor
 	- OrderProcessor
 	- PositionProcessor
@@ -60,13 +65,9 @@ Recommendation:
 - use REST Assured framework
 - automate login in tests (own runner or rules)
 - split tests to groups, depend from processor
-
  	
 #//TODO:
-- tests
 - validation
 	- parameters
 	- balance
 - notifications - update
-- start balance
-- update readme endpoints

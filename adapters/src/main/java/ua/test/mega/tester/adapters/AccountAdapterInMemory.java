@@ -52,4 +52,17 @@ public class AccountAdapterInMemory implements AccountAdapter {
 
 		accountByAccountId.put(updatedAccount.getAccountId(), updatedAccount);
 	}
+
+	@Override
+	public BigDecimal updateBalance(long accountId, BigDecimal amountInUSD) {
+		Account account = accountByAccountId.get(accountId);
+
+		Account updatedAccoutn = account.toBuilder()
+				.balanceInUSD(account.getBalanceInUSD().add(amountInUSD))
+				.build();
+
+		accountByAccountId.put(accountId, updatedAccoutn);
+
+		return updatedAccoutn.getBalanceInUSD();
+	}
 }

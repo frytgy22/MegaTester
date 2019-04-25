@@ -1,5 +1,7 @@
 package ua.test.mega.tester.rest;
 
+import java.math.BigDecimal;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,5 +57,17 @@ public class AccountRestController {
 				.accountId(account.getAccountId())
 				.balanceInUSD(account.getBalanceInUSD())
 				.build();
+	}
+
+	@Secured("ROLE_ADMIN")
+	@GetMapping(path = "/{accountId}/deposit/{amountInUSD}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public BigDecimal doDeposit(@PathVariable long accountId, @PathVariable BigDecimal amountInUSD) {
+		return accountProcessor.deposit(accountId, amountInUSD);
+	}
+
+	@Secured("ROLE_ADMIN")
+	@GetMapping(path = "/{accountId}/withdrawal/{amountInUSD}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public BigDecimal doWithdrawal(@PathVariable long accountId, @PathVariable BigDecimal amountInUSD) {
+		return accountProcessor.withdrawal(accountId, amountInUSD);
 	}
 }
