@@ -22,6 +22,7 @@ public class OrderProcessor {
 	}
 
 	public List<Order> findOrdersForLoffedinUser() {
+		System.out.println("dddddddd");
 		long accountId = loggedInUserAdapter.getLoggedInUser().getAccountId();
 
 		return orderAdapter.findAllByAccountId(accountId);

@@ -5,9 +5,11 @@ import java.time.ZonedDateTime;
 
 import lombok.Builder;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.Value;
 
 @Value
+@ToString
 @Builder(toBuilder = true)
 public class Order {
 
@@ -15,7 +17,7 @@ public class Order {
 	private final long orderId;
 
 	@NonNull
-	private long accountId;
+	private long accountId;//TODO final?
 
 	@NonNull
 	private final Currency baseCurrency;

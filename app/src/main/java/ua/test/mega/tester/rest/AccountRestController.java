@@ -37,7 +37,7 @@ public class AccountRestController {
 	public Flux<AccountDTO> getLoggedinUserAccountInfo() {
 		log.info("Get account info for logged in user");
 
-		Account account = accountProcessor.loadLoggedInUserAccountInfo();
+		Account account = accountProcessor.loadLoggedInUserAccountInfo();//return info current user
 
 		return Flux.just(toAccountDTO(account));
 	}
@@ -47,7 +47,7 @@ public class AccountRestController {
 	public Flux<AccountDTO> getAccountInfo(@PathVariable long accountId) {
 		log.info("Get account info for {}", accountId);
 
-		Account account = accountProcessor.loadAccountInfo(accountId);
+		Account account = accountProcessor.loadAccountInfo(accountId);//return any info by id
 
 		return Flux.just(toAccountDTO(account));
 	}

@@ -2,10 +2,12 @@ package ua.test.mega.tester.core.api.model;
 
 import lombok.Builder;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.Value;
 
 @Value
 @Builder
+@ToString
 public class Notification {
 
 	@NonNull

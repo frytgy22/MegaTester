@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.log4j.Log4j2;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import ua.test.mega.tester.core.api.LoggedInUserAdapter;
 import ua.test.mega.tester.core.api.NotificationAdapter;
@@ -14,8 +15,8 @@ import ua.test.mega.tester.core.api.model.NotificationType;
 @Component
 public class NotificationProcessor {
 
-	private LoggedInUserAdapter loggedInUserAdapter;
-	private NotificationAdapter notificationAdapter;
+	private final LoggedInUserAdapter loggedInUserAdapter;
+	private final NotificationAdapter notificationAdapter;
 
 	@Autowired
 	public NotificationProcessor(LoggedInUserAdapter loggedInUserAdapter,
@@ -26,7 +27,6 @@ public class NotificationProcessor {
 
 	public Flux<Notification> provideNotificationsForLoggedinUser() {
 		long accountId = loggedInUserAdapter.getLoggedInUser().getAccountId();
-
 		log.info("Get notifications for account {}", accountId);
 
 		return notificationAdapter.provideNotificationStream()

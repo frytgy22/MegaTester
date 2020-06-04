@@ -7,13 +7,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import lombok.ToString;
 import org.springframework.stereotype.Component;
 
 import ua.test.mega.tester.core.api.AccountAdapter;
 import ua.test.mega.tester.core.api.UserAdapter;
 import ua.test.mega.tester.core.api.model.Account;
 import ua.test.mega.tester.core.api.model.User;
-
+@ToString
 @Component
 public class AccountAdapterInMemory implements AccountAdapter {
 
@@ -27,7 +28,7 @@ public class AccountAdapterInMemory implements AccountAdapter {
 		accountByAccountId = stream
 				.collect((Supplier<Map<Long, Account>>) ConcurrentHashMap::new,
 						(accumulator, user) -> accumulator.put(user.getAccountId(), toAccount(user)),
-						(m1, m2) -> m1.putAll(m2));
+						Map::putAll);
 	}
 
 	private Account toAccount(User user) {

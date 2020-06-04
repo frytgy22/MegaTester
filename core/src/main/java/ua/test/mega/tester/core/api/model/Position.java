@@ -13,7 +13,7 @@ public class Position {
 	private final long positionId;
 
 	@NonNull
-	private long accountId;
+	private long accountId; //TODO final?
 
 	@NonNull
 	private final long orderId;

@@ -2,13 +2,16 @@ package ua.test.mega.tester.core;
 
 import java.math.BigDecimal;
 
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ua.test.mega.tester.core.api.AccountAdapter;
 import ua.test.mega.tester.core.api.LoggedInUserAdapter;
 import ua.test.mega.tester.core.api.model.Account;
+import ua.test.mega.tester.core.api.model.User;
 
+@ToString
 @Component
 public class AccountProcessor {
 
@@ -22,6 +25,7 @@ public class AccountProcessor {
 	}
 
 	public Account loadLoggedInUserAccountInfo() {
+
 		long accountId = loggedInUserAdapter.getLoggedInUser().getAccountId();
 
 		return accountAdapter.find(accountId);

@@ -12,7 +12,7 @@ public class PositionDTO {
 
 	private final long positionId;
 
-	private long accountId;
+	private long accountId;//TODO final?
 
 	private final long orderId;
 

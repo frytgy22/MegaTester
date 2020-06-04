@@ -1,10 +1,6 @@
 package ua.test.mega.tester.adapters;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -22,7 +18,7 @@ public class PositionAdapterInMemory implements PositionAdapter {
 	@Override
 	public List<Position> findAll(long accountId) {
 		return positions.values().stream()
-				.flatMap(positions -> positions.stream())
+				.flatMap(Collection::stream)
 				.collect(Collectors.toList());
 	}
 
