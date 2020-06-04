@@ -11,5 +11,5 @@ public class AccountDTO {
 
 	private final Long accountId;
 
-	public final BigDecimal balanceInUSD;//TODO public?
+	private final BigDecimal balanceInUSD;
 }

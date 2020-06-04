@@ -24,8 +24,8 @@ import java.time.ZonedDateTime;
 public class OrderManagementProcessorTest {
     private static UserAdapter userAdapter;
     private OrderManagementProcessor orderManagementProcessor;
-    private Order order;
-    private Order actual;
+    private Order firstActualOrder;
+    private Order secondActualOrder;
 
     @BeforeClass
     public static void init() {
@@ -43,7 +43,7 @@ public class OrderManagementProcessorTest {
         orderManagementProcessor = new OrderManagementProcessor(
                 orderAdapter, positionAdapter, accountAdapter, notificationAdapter, loggedInUserAdapter);
 
-        order = Order.builder()
+        firstActualOrder = Order.builder()
                 .accountId(1L)
                 .baseCurrency(Currency.UAH)
                 .quoteCurrency(Currency.EUR)
@@ -54,37 +54,37 @@ public class OrderManagementProcessorTest {
                 .executionDate(ZonedDateTime.now())
                 .build();
 
-        actual = Order.builder()
+        secondActualOrder = Order.builder()
                 .orderId(1)
-                .accountId(order.getAccountId())
-                .baseCurrency(order.getBaseCurrency())
-                .quoteCurrency(order.getQuoteCurrency())
-                .rate(order.getRate())
-                .side(order.getSide())
-                .amount(order.getAmount())
-                .createDate(order.getCreateDate())
-                .executionDate(order.getExecutionDate())
+                .accountId(firstActualOrder.getAccountId())
+                .baseCurrency(firstActualOrder.getBaseCurrency())
+                .quoteCurrency(firstActualOrder.getQuoteCurrency())
+                .rate(firstActualOrder.getRate())
+                .side(firstActualOrder.getSide())
+                .amount(firstActualOrder.getAmount())
+                .createDate(firstActualOrder.getCreateDate())
+                .executionDate(firstActualOrder.getExecutionDate())
                 .build();
     }
 
     @WithMockUser(username = "user1")
     @Test
     public void placeOrder1() {
-        Order expected = orderManagementProcessor.placeOrder(order);
-        Assert.assertEquals(actual, expected);
+        Order expected = orderManagementProcessor.placeOrder(firstActualOrder);
+        Assert.assertEquals(secondActualOrder, expected);
     }
 
     @WithMockUser(username = "admin")
     @Test
     public void placeOrder2() {
-        Order expected = orderManagementProcessor.placeOrder(order);
-        Assert.assertNotEquals(actual, expected);
+        Order expected = orderManagementProcessor.placeOrder(firstActualOrder);
+        Assert.assertNotEquals(secondActualOrder, expected);
     }
 
     @WithAnonymousUser
     @Test(expected = NullPointerException.class)
     public void placeOrder3() {
-        orderManagementProcessor.placeOrder(order);
+        orderManagementProcessor.placeOrder(firstActualOrder);
     }
 
     @WithMockUser(username = "user1")

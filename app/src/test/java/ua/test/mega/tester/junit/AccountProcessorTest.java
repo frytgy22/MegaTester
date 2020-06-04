@@ -1,127 +1,148 @@
 package ua.test.mega.tester.junit;
 
-
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
-import ua.test.mega.tester.adapters.AccountAdapterInMemory;
-import ua.test.mega.tester.adapters.LoggedInUserAdapterForSpringSecurity;
-import ua.test.mega.tester.adapters.UserAdapterInMemory;
+
 import ua.test.mega.tester.core.AccountProcessor;
-import ua.test.mega.tester.core.api.AccountAdapter;
-import ua.test.mega.tester.core.api.LoggedInUserAdapter;
-import ua.test.mega.tester.core.api.UserAdapter;
 import ua.test.mega.tester.core.api.model.Account;
 
 import java.math.BigDecimal;
 
-
 @RunWith(SpringRunner.class)
+@SpringBootTest
 public class AccountProcessorTest {
-    private static Account actualFirstAccount;
-    private static Account actualSecondAccount;
+	private static final String ERROR_MESSAGE = "doesn't match to ";
 
-    private static UserAdapter userAdapter;
-    private AccountProcessor accountProcessor;
+	@Autowired
+	private AccountProcessor accountProcessor;
 
+	@WithMockUser(username = "user1")
+	@Test
+	public void loadLoggedInUserAccountInfo1() {
 
-    @BeforeClass
-    public static void init() {
-        userAdapter = new UserAdapterInMemory();
+		//given
 
-        actualFirstAccount = Account.builder()
-                .accountId(1L)
-                .balanceInUSD(new BigDecimal(1000))
-                .build();
+		Account actualFirstAccount = Account.builder()
+				.accountId(1L)
+				.balanceInUSD(new BigDecimal(2500))
+				.build();
 
-        actualSecondAccount = Account.builder()
-                .accountId(-1L)
-                .balanceInUSD(new BigDecimal(1000))
-                .build();
-    }
+		Account expected = accountProcessor.loadLoggedInUserAccountInfo();
+		Assert.assertEquals(expected, actualFirstAccount);
+	}
 
-    @Before
-    public void setUp() {
-        LoggedInUserAdapter loggedInUserAdapter = new LoggedInUserAdapterForSpringSecurity(userAdapter);
-        AccountAdapter accountAdapter = new AccountAdapterInMemory(userAdapter);
+	@WithMockUser(username = "admin")
+	@Test
+	public void loadLoggedInUserAccountInfo2() {
+		//given
+		Account actualSecondAccount = Account.builder()
+				.accountId(-1L)
+				.balanceInUSD(new BigDecimal(2500))
+				.build();
 
-        accountProcessor = new AccountProcessor(loggedInUserAdapter, accountAdapter);
-    }
+		//when
+		Account expected = accountProcessor.loadLoggedInUserAccountInfo();
 
-    @WithMockUser(username = "user1")
-    @Test
-    public void loadLoggedInUserAccountInfo1() {
-        Account expected = accountProcessor.loadLoggedInUserAccountInfo();
-        Assert.assertEquals(actualFirstAccount, expected);
-    }
+		//then
+		Assert.assertEquals(expected + ERROR_MESSAGE + actualSecondAccount, expected, actualSecondAccount);
+	}
 
-    @WithMockUser(username = "admin")
-    @Test
-    public void loadLoggedInUserAccountInfo2() {
-        Account expected = accountProcessor.loadLoggedInUserAccountInfo();
-        Assert.assertEquals(actualSecondAccount, expected);
-    }
+	@WithAnonymousUser
+	@Test(expected = NullPointerException.class)
+	public void loadLoggedInUserAccountInfo3() {
+		accountProcessor.loadLoggedInUserAccountInfo();
+	}
 
-    @WithAnonymousUser
-    @Test(expected = NullPointerException.class)
-    public void loadLoggedInUserAccountInfo3() {
-        accountProcessor.loadLoggedInUserAccountInfo();
-    }
+	@Test
+	public void loadAccountInfo1() {
+		//given
+		Account actualThirdAccount = Account.builder()
+				.accountId(1L)
+				.balanceInUSD(new BigDecimal(500))
+				.build();
 
-    @Test
-    public void loadAccountInfo1() {
-        Account expected = accountProcessor.loadAccountInfo(1L);
-        Assert.assertEquals(actualFirstAccount, expected);
-    }
+		//when
+		Account expected = accountProcessor.loadAccountInfo(1L);
 
-    @Test
-    public void loadAccountInfo2() {
-        Account expected = accountProcessor.loadAccountInfo(-1L);
-        Assert.assertEquals(actualSecondAccount, expected);
-    }
+		//then
+		Assert.assertEquals(expected + ERROR_MESSAGE + actualThirdAccount, expected, actualThirdAccount);
+	}
 
-    @Test
-    public void loadAccountInfo3() {
-        Account expected = accountProcessor.loadAccountInfo(-5L);
-        Assert.assertNull(expected);
-    }
+	@Test
+	public void loadAccountInfo2() {
+		//given
+		Account actualFourAccount = Account.builder()
+				.accountId(-1L)
+				.balanceInUSD(new BigDecimal(1000))
+				.build();
 
-    @Test
-    public void deposit1() {
-        BigDecimal expected = accountProcessor.deposit(1L, new BigDecimal(2000));
-        Assert.assertEquals(new BigDecimal(3000), expected);
-    }
+		//when
+		Account expected = accountProcessor.loadAccountInfo(-1L);
 
-    @Test
-    public void deposit2() {
-        BigDecimal expected = accountProcessor.deposit(-1L, new BigDecimal(2000));
-        Assert.assertEquals(new BigDecimal(3000), expected);
-    }
+		//then
+		Assert.assertEquals(expected + ERROR_MESSAGE + actualFourAccount, expected, actualFourAccount);
+	}
 
-    @Test(expected = NullPointerException.class)
-    public void deposit3() {
-        accountProcessor.deposit(-5L, new BigDecimal(2000));
-    }
+	@Test
+	public void loadAccountInfo3() {
+		//when
+		Account expected = accountProcessor.loadAccountInfo(-5L);
 
-    @Test
-    public void withdrawal() {
-        BigDecimal expected = accountProcessor.withdrawal(1L, new BigDecimal(500));
-        Assert.assertEquals(new BigDecimal(500), expected);
-    }
+		//then
+		Assert.assertNull(expected + "must be null", expected);
+	}
 
-    @Test
-    public void withdrawal2() {
-        BigDecimal expected = accountProcessor.withdrawal(-1L, new BigDecimal(500));
-        Assert.assertEquals(new BigDecimal(500), expected);
-    }
+	@Test
+	public void deposit1() {
+		//when
+		BigDecimal expected = accountProcessor.deposit(1L, new BigDecimal(2000));
 
-    @Test(expected = NullPointerException.class)
-    public void withdrawal3() {
-        accountProcessor.withdrawal(-5L, new BigDecimal(500));
-    }
+		//then
+		Assert.assertEquals(expected + ERROR_MESSAGE + new BigDecimal(2500), expected, new BigDecimal(2500));
+	}
+
+	@Test
+	public void deposit2() {
+		//when
+		BigDecimal expected = accountProcessor.deposit(-1L, new BigDecimal(2000));
+
+		//then
+		Assert.assertEquals(expected + ERROR_MESSAGE + new BigDecimal(3000), expected, new BigDecimal(3000));
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void deposit3() {
+		accountProcessor.deposit(-5L, new BigDecimal(2000));
+	}
+
+	@Test
+	public void withdrawal() {
+		//when
+		BigDecimal expected = accountProcessor.withdrawal(1L, new BigDecimal(500));
+
+		//then
+		Assert.assertEquals(expected, new BigDecimal(500));
+	}
+
+	@Test
+	public void withdrawal2() {
+		//when
+		BigDecimal expected = accountProcessor.withdrawal(-1L, new BigDecimal(500));
+
+		//then
+		Assert.assertEquals(expected + ERROR_MESSAGE + new BigDecimal(2500), expected, new BigDecimal(2500));
+
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void withdrawal3() {
+		accountProcessor.withdrawal(-5L, new BigDecimal(500));
+	}
 }

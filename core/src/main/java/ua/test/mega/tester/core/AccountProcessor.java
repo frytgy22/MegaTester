@@ -9,14 +9,13 @@ import org.springframework.stereotype.Component;
 import ua.test.mega.tester.core.api.AccountAdapter;
 import ua.test.mega.tester.core.api.LoggedInUserAdapter;
 import ua.test.mega.tester.core.api.model.Account;
-import ua.test.mega.tester.core.api.model.User;
 
 @ToString
 @Component
 public class AccountProcessor {
 
-	private LoggedInUserAdapter loggedInUserAdapter;
-	private AccountAdapter accountAdapter;
+	private final LoggedInUserAdapter loggedInUserAdapter;
+	private final AccountAdapter accountAdapter;
 
 	@Autowired
 	public AccountProcessor(LoggedInUserAdapter loggedInUserAdapter, AccountAdapter accountAdapter) {

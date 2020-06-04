@@ -11,7 +11,7 @@ import ua.test.mega.tester.core.api.model.Notification;
 @Component
 public class NotificationReactiveStreamAdapter implements NotificationAdapter {
 
-    private final FluxProcessor processor = DirectProcessor.create();//TODO
+    private final FluxProcessor processor = DirectProcessor.create();
 
     @Override
     public void register(Notification notification) {

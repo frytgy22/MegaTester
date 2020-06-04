@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.ToString;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,7 @@ import ua.test.mega.tester.core.api.LoggedInUserAdapter;
 import ua.test.mega.tester.core.api.UserAdapter;
 import ua.test.mega.tester.core.api.model.User;
 import ua.test.mega.tester.core.exceptions.UnauthorizedRequestException;
+
 @ToString
 @Component
 public class LoggedInUserAdapterForSpringSecurity implements LoggedInUserAdapter {
@@ -27,7 +29,6 @@ public class LoggedInUserAdapterForSpringSecurity implements LoggedInUserAdapter
 
 	@Override
 	public User getLoggedInUser() {
-		System.out.println(69);
 		String loggedInUsername = getLoggedInUsername();
 
 		if (null == loggedInUsername) {
