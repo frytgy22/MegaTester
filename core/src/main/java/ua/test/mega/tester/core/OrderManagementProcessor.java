@@ -24,136 +24,136 @@ import ua.test.mega.tester.core.exceptions.NotEnoughMoney;
 @Component
 public class OrderManagementProcessor {
 
-    private static final double COMMISSION = 0.05;
+	private static final double COMMISSION = 0.05;
 
-    private OrderAdapter orderAdapter;
-    private PositionAdapter positionAdapter;
-    private AccountAdapter accountAdapter;
-    private NotificationAdapter notificationAdapter;
-    private LoggedInUserAdapter loggedInUserAdapter;
+	private OrderAdapter orderAdapter;
+	private PositionAdapter positionAdapter;
+	private AccountAdapter accountAdapter;
+	private NotificationAdapter notificationAdapter;
+	private LoggedInUserAdapter loggedInUserAdapter;
 
-    @Autowired
-    public OrderManagementProcessor(
-            OrderAdapter orderAdapter,
-            PositionAdapter positionAdapter,
-            AccountAdapter accountAdapter,
-            NotificationAdapter notificationAdapter,
-            LoggedInUserAdapter loggedInUserAdapter) {
+	@Autowired
+	public OrderManagementProcessor(
+			OrderAdapter orderAdapter,
+			PositionAdapter positionAdapter,
+			AccountAdapter accountAdapter,
+			NotificationAdapter notificationAdapter,
+			LoggedInUserAdapter loggedInUserAdapter) {
 
-        this.orderAdapter = orderAdapter;
-        this.positionAdapter = positionAdapter;
-        this.accountAdapter = accountAdapter;
-        this.notificationAdapter = notificationAdapter;
-        this.loggedInUserAdapter = loggedInUserAdapter;
-    }
+		this.orderAdapter = orderAdapter;
+		this.positionAdapter = positionAdapter;
+		this.accountAdapter = accountAdapter;
+		this.notificationAdapter = notificationAdapter;
+		this.loggedInUserAdapter = loggedInUserAdapter;
+	}
 
-    public Order placeOrder(Order order) {
-        validateInOrder(order);
+	public Order placeOrder(Order order) {
 
-        Order orderWithAccountId = prepareOrderWithAccountId(order);
+		validateInOrder(order);
 
-        //create
-        Order savedOrder = orderAdapter.create(orderWithAccountId);
-        System.out.println(savedOrder);
+		Order orderWithAccountId = prepareOrderWithAccountId(order);
 
-        //run calculation of the position and  account balance
-        recalculateAccountBalanceAsynchronously(savedOrder);
+		//create
+		Order savedOrder = orderAdapter.create(orderWithAccountId);
 
-        return savedOrder;
-    }
+		//run calculation of the position and  account balance
+		recalculateAccountBalanceAsynchronously(savedOrder);
 
-    private void validateInOrder(Order order) {
-        if (0 == order.getAccountId()
-                || null == order.getBaseCurrency()
-                || null == order.getQuoteCurrency()
-                || null == order.getSide()
-                || null == order.getAmount()) {
-            throw new InconsistentOrderParameters();
-        }
+		return savedOrder;
+	}
 
-        if (order.getAmount().compareTo(BigDecimal.ZERO) <= 0) {//TODO fixed >=
-            throw new InconsistentOrderAmount();
-        }
+	private void validateInOrder(Order order) {
+		if (0 == order.getAccountId()
+				|| null == order.getBaseCurrency()
+				|| null == order.getQuoteCurrency()
+				|| null == order.getSide()
+				|| null == order.getAmount()) {
+			throw new InconsistentOrderParameters();
+		}
 
-    }
+		if (order.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+			throw new InconsistentOrderAmount();
+		}
 
-    private Order prepareOrderWithAccountId(Order order) {
-        long accountId = loggedInUserAdapter.getLoggedInUser().getAccountId();
+	}
 
-        return order.toBuilder()
-                .accountId(accountId)
-                .build();
-    }
+	private Order prepareOrderWithAccountId(Order order) {
+		long accountId = loggedInUserAdapter.getLoggedInUser().getAccountId();
 
-    private void recalculateAccountBalanceAsynchronously(Order savedOrder) {
-        Flux.just(savedOrder)
-                .delayElements(Duration.ofMillis(100))
-                .map(this::createPosition)
+		return order.toBuilder()
+				.accountId(accountId)
+				.build();
+	}
 
-                .delayElements(Duration.ofMillis(100))
-                .doOnNext(this::calculateMoneyMovementAndSave)
+	private void recalculateAccountBalanceAsynchronously(Order savedOrder) {
+		Flux.just(savedOrder)
+				.delayElements(Duration.ofMillis(100))
+				.map(this::createPosition)
 
-                .delayElements(Duration.ofMillis(100))
-                .doOnNext(this::calculateCommissionAndSave)
+				.delayElements(Duration.ofMillis(100))
+				.doOnNext(this::calculateMoneyMovementAndSave)
 
-                .delayElements(Duration.ofMillis(100))
-                .subscribe(
-                        position -> notificationAdapter.register(NotificationFactory.newPositionCreated(savedOrder, position)),
-                        error -> notificationAdapter.register(NotificationFactory.errorOnOrderProcessing(error, savedOrder))
-                );
-    }
+				.delayElements(Duration.ofMillis(100))
+				.doOnNext(this::calculateCommissionAndSave)
 
-    private Position createPosition(Order savedOrder) {
-        Position newPosition = newPosition(savedOrder);
-        return positionAdapter.create(newPosition);
-    }
+				.delayElements(Duration.ofMillis(100))
+				.subscribe(
+						position -> notificationAdapter.register(NotificationFactory.newPositionCreated(savedOrder, position)),
+						error -> notificationAdapter.register(NotificationFactory.errorOnOrderProcessing(error, savedOrder))
+				);
+	}
 
-    private void calculateMoneyMovementAndSave(Position position) {
+	private Position createPosition(Order savedOrder) {
+		Position newPosition = newPosition(savedOrder);
+		return positionAdapter.create(newPosition);
+	}
 
-        long accountId = position.getAccountId();
-        Order order = orderAdapter.find(position.getOrderId());
-        double priceInUSD = Side.BUY == order.getSide()
-                ? -position.getPriceInUSD()
-                : position.getPriceInUSD();
+	private void calculateMoneyMovementAndSave(Position position) {
 
-        updateAccoutnBalance(new BigDecimal(priceInUSD), accountId);
-    }
+		long accountId = position.getAccountId();
+		Order order = orderAdapter.find(position.getOrderId());
+		double priceInUSD = Side.BUY == order.getSide()
+				? -position.getPriceInUSD()
+				: position.getPriceInUSD();
 
-    private void updateAccoutnBalance(BigDecimal priceInUSD, long accountId) {
-        Account account = accountAdapter.find(accountId);
+		updateAccoutnBalance(new BigDecimal(priceInUSD), accountId);
+	}
 
-        BigDecimal previousBalanceInUSD = account.getBalanceInUSD();
-        BigDecimal newBalanceInUSD = previousBalanceInUSD.add(priceInUSD);
+	private void updateAccoutnBalance(BigDecimal priceInUSD, long accountId) {
+		Account account = accountAdapter.find(accountId);
 
-        validateBalance(newBalanceInUSD);
+		BigDecimal previousBalanceInUSD = account.getBalanceInUSD();
+		BigDecimal newBalanceInUSD = previousBalanceInUSD.add(priceInUSD);
 
-        Account updatedAccount = account.toBuilder()
-                .balanceInUSD(newBalanceInUSD)
-                .build();
+		validateBalance(newBalanceInUSD);
 
-        accountAdapter.update(updatedAccount);
-    }
+		Account updatedAccount = account.toBuilder()
+				.balanceInUSD(newBalanceInUSD)
+				.build();
 
-    private void validateBalance(BigDecimal newBalanceInUSD) {
-        if (newBalanceInUSD.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new NotEnoughMoney();
-        }
-    }
+		accountAdapter.update(updatedAccount);
+	}
 
-    private void calculateCommissionAndSave(Position position) {
-        long accountId = position.getAccountId();
-        double priceInUSD = position.getPriceInUSD();
-        double commissionInUSD = -priceInUSD * COMMISSION;
+	private void validateBalance(BigDecimal newBalanceInUSD) {
+		if (newBalanceInUSD.compareTo(BigDecimal.ZERO) <= 0) {
+			throw new NotEnoughMoney();
+		}
+	}
 
-        updateAccoutnBalance(new BigDecimal(commissionInUSD), accountId);
-    }
+	private void calculateCommissionAndSave(Position position) {
+		long accountId = position.getAccountId();
+		double priceInUSD = position.getPriceInUSD();
+		double commissionInUSD = -priceInUSD * COMMISSION;
 
-    private Position newPosition(Order order) {
-        return Position.builder()
-                .orderId(order.getOrderId())
-                .accountId(order.getAccountId())
-                .executionDate(ZonedDateTime.now())
-                .priceInUSD(order.getRate())
-                .build();
-    }
+		updateAccoutnBalance(new BigDecimal(commissionInUSD), accountId);
+	}
+
+	private Position newPosition(Order order) {
+		return Position.builder()
+				.orderId(order.getOrderId())
+				.accountId(order.getAccountId())
+				.executionDate(ZonedDateTime.now())
+				.priceInUSD(order.getRate())
+				.build();
+	}
 }

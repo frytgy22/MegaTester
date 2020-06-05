@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+
 import ua.test.mega.tester.core.OrderProcessor;
 import ua.test.mega.tester.core.api.LoggedInUserAdapter;
 import ua.test.mega.tester.core.api.OrderAdapter;
@@ -28,47 +29,46 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 public class OrderProcessorTest {
 
-    @InjectMocks
-    private OrderProcessor orderProcessor;
+	@InjectMocks
+	private OrderProcessor orderProcessor;
 
-    @Mock
-    private OrderAdapter orderAdapter;
+	@Mock
+	private OrderAdapter orderAdapter;
 
-    @Mock
-    private LoggedInUserAdapter loggedInUserAdapter;
+	@Mock
+	private LoggedInUserAdapter loggedInUserAdapter;
 
+	@WithMockUser(username = "user1")
+	@Test
+	public void findOrdersForLoffedinUser1() {
 
-    @WithMockUser(username = "user1")
-    @Test
-    public void findOrdersForLoffedinUser1() {
+		List<Order> actual = Collections.singletonList(
+				Order.builder()
+						.orderId(1)
+						.accountId(1)
+						.baseCurrency(Currency.UAH)
+						.quoteCurrency(Currency.EUR)
+						.rate(10)
+						.side(Side.BUY)
+						.amount(new BigDecimal(100))
+						.createDate(ZonedDateTime.of(2020, 3, 5, 1, 1, 1,
+								1, ZoneId.of("UTC")))
+						.executionDate(ZonedDateTime.of(2020, 3, 5, 1, 1, 1,
+								1, ZoneId.of("UTC")))
+						.build());
 
-        List<Order> orders = Collections.singletonList(
-                Order.builder()
-                        .orderId(1)
-                        .accountId(1)
-                        .baseCurrency(Currency.UAH)
-                        .quoteCurrency(Currency.EUR)
-                        .rate(10)
-                        .side(Side.BUY)
-                        .amount(new BigDecimal(100))
-                        .createDate(ZonedDateTime.of(2020, 3, 5, 1, 1, 1,
-                                1, ZoneId.of("UTC")))
-                        .executionDate(ZonedDateTime.of(2020, 3, 5, 1, 1, 1,
-                                1, ZoneId.of("UTC")))
-                        .build());
+		when(orderAdapter.findAllByAccountId(1)).thenReturn(actual);
 
-        when(orderAdapter.findAllByAccountId(1)).thenReturn(orders);
+		when(loggedInUserAdapter.getLoggedInUser()).thenReturn(
+				User.builder()
+						.username("user1")
+						.password("user1")
+						.accountId(1)
+						.roles(Collections.singletonList("USER"))
+						.build());
 
-        when(loggedInUserAdapter.getLoggedInUser()).thenReturn(
-                User.builder()
-                        .username("user1")
-                        .password("user1")
-                        .accountId(1)
-                        .roles(Collections.singletonList("USER"))
-                        .build());
+		List<Order> expected = orderProcessor.findOrdersForLoffedinUser();
 
-        List<Order> expected = orderProcessor.findOrdersForLoffedinUser();
-
-        Assert.assertEquals(orders, expected);
-    }
+		Assert.assertEquals(expected, actual);
+	}
 }

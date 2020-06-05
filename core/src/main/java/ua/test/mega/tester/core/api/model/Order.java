@@ -17,7 +17,7 @@ public class Order {
 	private final long orderId;
 
 	@NonNull
-	private long accountId;//TODO final?
+	private final long accountId;
 
 	@NonNull
 	private final Currency baseCurrency;
