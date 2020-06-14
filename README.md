@@ -18,7 +18,7 @@ Application - is REST service for:
 	- / **GET** - receiving logged in user account
 	- /{accountId} **GET** - receiving account by account id
 	- /{accountId}/deposit/{amountInUSD} - for deposit to user account. Return new balance
-	- /{accountId}/deposit/{amountInUSD} - for withdrawal from user account. Return new balance
+	- /{accountId}/withdrawal/{amountInUSD} - for withdrawal from user account. Return new balance
 - /api/notification/
 	- /{accountId} **GET** (text/event-stream) - Server Side Events for receiving stream of the events for logged in user
 	- /all **GET** (text/event-stream) - Server Side Events for receiving stream of the all events
