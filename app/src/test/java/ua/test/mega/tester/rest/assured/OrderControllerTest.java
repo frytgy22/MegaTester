@@ -12,8 +12,8 @@ import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import static io.restassured.RestAssured.baseURI;
-import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.*;
+import static io.restassured.RestAssured.preemptive;
 import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(SpringRunner.class)
@@ -21,7 +21,9 @@ public class OrderControllerTest {
 
     @Before
     public void setURI() {
+
         baseURI = "http://localhost:8080/api/order/";
+        authentication = preemptive().basic("user1", "user1");
     }
 
 
@@ -41,7 +43,6 @@ public class OrderControllerTest {
 
 
         given()
-                .auth().preemptive().basic("user1", "user1")
                 .contentType("application/json")
                 .body(order)
                 .when()
@@ -54,7 +55,6 @@ public class OrderControllerTest {
     @Test
     public void shouldShowAllOrders() {
         given()
-                .auth().preemptive().basic("user1", "user1")
                 .contentType("application/json")
                 .when()
                 .get("/")

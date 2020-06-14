@@ -1,5 +1,6 @@
 package ua.test.mega.tester.rest.assured;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -11,11 +12,17 @@ import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(SpringRunner.class)
 public class PositionControllerTest {
+
+    @Before
+    public void setURI() {
+        authentication = preemptive().basic("user1", "user1");
+    }
+
 
     @Test
     public void shouldShowCurrentUserAccount1() {
@@ -34,7 +41,6 @@ public class PositionControllerTest {
 
 
         given()
-                .auth().preemptive().basic("user1", "user1")
                 .contentType("application/json")
                 .body(order)
                 .when()
@@ -44,7 +50,6 @@ public class PositionControllerTest {
                 .log();
 
         given()
-                .auth().preemptive().basic("user1", "user1")
                 .contentType("application/json")
                 .when()
                 .get("http://localhost:8080/api/position/")

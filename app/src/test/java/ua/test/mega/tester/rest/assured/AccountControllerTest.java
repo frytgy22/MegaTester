@@ -1,28 +1,35 @@
 package ua.test.mega.tester.rest.assured;
 
 import io.restassured.response.Response;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.io.IOException;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
+@MegaAdmin
 @RunWith(SpringRunner.class)
 public class AccountControllerTest {
 
-    @Before
-    public void setURI() {
+    @BeforeClass
+    public static void setUp() {
         baseURI = "http://localhost:8080/api/account/";
+
+        TestAnnotationRole annotationRole = new TestAnnotationRole();
+        annotationRole.getRole(AccountControllerTest.class);
     }
+
 
     @Test
     public void shouldShowCurrentUserAccount1() {
         given()
-                .auth().preemptive().basic("user1", "user1")
+                .auth().basic("user1", "user1")
                 .contentType("application/json")
                 .when()
                 .get("/")
@@ -34,8 +41,8 @@ public class AccountControllerTest {
 
     @Test
     public void shouldShowCurrentUserAccount2() {
+
         given()
-                .auth().preemptive().basic("admin", "password")
                 .contentType("application/json")
                 .when()
                 .get("/")
@@ -48,7 +55,6 @@ public class AccountControllerTest {
     @Test
     public void shouldShowUserAccount1() {
         given()
-                .auth().preemptive().basic("admin", "password")
                 .contentType("application/json")
                 .when()
                 .get("/1")
@@ -58,10 +64,10 @@ public class AccountControllerTest {
                 .log().body();
     }
 
+
     @Test
     public void shouldShowUserAccount2() {
         given()
-                .auth().preemptive().basic("admin", "password")
                 .contentType("application/json")
                 .when()
                 .get("/2")
@@ -85,7 +91,6 @@ public class AccountControllerTest {
 
     @Test
     public void shouldIncreaseDeposit() {
-
         Response response =
                 given()
                         .auth().preemptive().basic("admin", "password")
@@ -98,7 +103,7 @@ public class AccountControllerTest {
                         .extract()
                         .response();
 
-        assertEquals(response.body().print(), "2000");
+        assertEquals(response.body().print(), "1000");
     }
 
     @Test
@@ -116,7 +121,6 @@ public class AccountControllerTest {
     @Test
     public void shouldWithdrawal() {
         Response response = given()
-                .auth().preemptive().basic("admin", "password")
                 .contentType("application/json")
                 .when()
                 .get("/1/withdrawal/1000")
@@ -126,18 +130,18 @@ public class AccountControllerTest {
                 .extract()
                 .response();
 
-        assertEquals(response.body().print(), "1000");
+        assertEquals(response.body().print(), "0");
     }
 
     @Test
     public void shouldAccessDenied3() {
         given()
-                .auth().preemptive().basic("user1", "user1")
+                .auth().preemptive().basic("123", "123")
                 .contentType("application/json")
                 .when()
                 .get("/1/withdrawal/1000")
                 .then()
-                .statusCode(403)
+                .statusCode(401)
                 .log().body();
     }
 
