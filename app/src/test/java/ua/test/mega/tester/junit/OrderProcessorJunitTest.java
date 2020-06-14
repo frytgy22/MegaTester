@@ -1,26 +1,21 @@
 package ua.test.mega.tester.junit;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import ua.test.mega.tester.adapters.LoggedInUserAdapterForSpringSecurity;
+import org.junit.runners.JUnit4;
 import ua.test.mega.tester.adapters.OrderAdapterInMemory;
-import ua.test.mega.tester.adapters.UserAdapterInMemory;
+import ua.test.mega.tester.byCategory.categories.OrderProcessorCategory;
 import ua.test.mega.tester.core.OrderProcessor;
 import ua.test.mega.tester.core.api.LoggedInUserAdapter;
 import ua.test.mega.tester.core.api.OrderAdapter;
-import ua.test.mega.tester.core.api.UserAdapter;
 import ua.test.mega.tester.core.api.model.Currency;
 import ua.test.mega.tester.core.api.model.Order;
 import ua.test.mega.tester.core.api.model.Side;
-import ua.test.mega.tester.byCategory.categories.OrderProcessorCategory;
+import ua.test.mega.tester.core.api.model.User;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -28,27 +23,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @Category(OrderProcessorCategory.class)
-@RunWith(SpringRunner.class)
+@RunWith(JUnit4.class)
 public class OrderProcessorJunitTest {
-    private static UserAdapter userAdapter;
     private OrderProcessor orderProcessor;
     private OrderAdapter orderAdapter;
 
-    @BeforeClass
-    public static void init() {
-        userAdapter = new UserAdapterInMemory();
-    }
-
     @Before
     public void setUp() {
-        LoggedInUserAdapter loggedInUserAdapter = new LoggedInUserAdapterForSpringSecurity(userAdapter);
+        LoggedInUserAdapter loggedInUserAdapter = () -> User.builder()
+                .accountId(1)
+                .username("admin")
+                .password("password")
+                .roles(Collections.singletonList("ADMIN"))
+                .build();
+
         orderAdapter = new OrderAdapterInMemory();
         orderProcessor = new OrderProcessor(loggedInUserAdapter, orderAdapter);
     }
 
-
-    @WithMockUser(username = "user1")
     @Test
     public void findOrdersForLoffedinUser1() {
         //given
@@ -67,6 +61,7 @@ public class OrderProcessorJunitTest {
         orderAdapter.create(order);
 
         List<Order> actual = orderProcessor.findOrdersForLoffedinUser();
+        log.info("actual order: {}", order);
 
         //then
         List<Order> expected = Collections.singletonList(Order.builder()
@@ -84,19 +79,12 @@ public class OrderProcessorJunitTest {
         Assert.assertEquals(expected, actual);
     }
 
-    @WithAnonymousUser
-    @Test(expected = NullPointerException.class)
-    public void findOrdersForLoffedinUser2() {
-        orderProcessor.findOrdersForLoffedinUser();
-    }
-
-    @WithMockUser(username = "admin")
     @Test
     public void findOrdersForLoffedinUser3() {
         //when
         List<Order> actual = orderProcessor.findOrdersForLoffedinUser();
 
         //then
-        Assert.assertEquals(actual, new ArrayList<Order>());
+        Assert.assertEquals(new ArrayList<Order>(), actual);
     }
 }

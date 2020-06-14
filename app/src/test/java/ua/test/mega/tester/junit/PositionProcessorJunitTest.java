@@ -99,6 +99,6 @@ public class PositionProcessorJunitTest {
         List<Position> actual = positionProcessor.findPositions();
 
         //then
-        Assert.assertEquals(actual, new ArrayList<Position>());
+        Assert.assertEquals(new ArrayList<Position>(), actual);
     }
 }

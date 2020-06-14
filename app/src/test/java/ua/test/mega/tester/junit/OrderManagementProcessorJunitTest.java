@@ -78,7 +78,7 @@ public class OrderManagementProcessorJunitTest {
         Order actual = orderManagementProcessor.placeOrder(firstExpectedOrder);
 
         //then
-        Assert.assertEquals(actual, secondExpectedOrder);
+        Assert.assertEquals(secondExpectedOrder, actual);
     }
 
     @WithMockUser(username = "admin")
@@ -88,7 +88,7 @@ public class OrderManagementProcessorJunitTest {
         Order actual = orderManagementProcessor.placeOrder(firstExpectedOrder);
 
         //then
-        Assert.assertNotSame(actual, secondExpectedOrder);
+        Assert.assertNotSame(secondExpectedOrder, actual);
     }
 
     @WithAnonymousUser

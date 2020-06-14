@@ -68,13 +68,13 @@ public class AccountProcessorMockitoTest {
                         .build());
 
         Account actual = accountProcessor.loadLoggedInUserAccountInfo();
-        Assert.assertEquals(actual, expected);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void loadAccountInfo2() {
         Account actual = accountProcessor.loadAccountInfo(1L);
-        Assert.assertEquals(actual, expected);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class AccountProcessorMockitoTest {
         when(accountAdapter.updateBalance(1, new BigDecimal(2000))).thenReturn(new BigDecimal(3000));
 
         BigDecimal actual = accountProcessor.deposit(1L, new BigDecimal(2000));
-        Assert.assertEquals(actual, new BigDecimal(3000));
+        Assert.assertEquals(new BigDecimal(3000), actual);
     }
 
     @Test
@@ -90,7 +90,7 @@ public class AccountProcessorMockitoTest {
         when(accountAdapter.updateBalance(-1, new BigDecimal(2000))).thenReturn(new BigDecimal(3000));
 
         BigDecimal actual = accountProcessor.deposit(-1L, new BigDecimal(2000));
-        Assert.assertEquals(actual, new BigDecimal(3000));
+        Assert.assertEquals(new BigDecimal(3000), actual);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class AccountProcessorMockitoTest {
         when(accountAdapter.updateBalance(1, new BigDecimal(-500))).thenReturn(new BigDecimal(500));
 
         BigDecimal actual = accountProcessor.withdrawal(1, new BigDecimal(500));
-        Assert.assertEquals(actual, new BigDecimal(500));
+        Assert.assertEquals(new BigDecimal(500), actual);
     }
 
     @Test
@@ -106,6 +106,6 @@ public class AccountProcessorMockitoTest {
         when(accountAdapter.updateBalance(-1, new BigDecimal(-1000))).thenReturn(new BigDecimal(0));
 
         BigDecimal actual = accountProcessor.withdrawal(-1L, new BigDecimal(1000));
-        Assert.assertEquals(actual, new BigDecimal(0));
+        Assert.assertEquals(new BigDecimal(0), actual);
     }
 }

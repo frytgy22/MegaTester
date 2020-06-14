@@ -63,6 +63,6 @@ public class PositionProcessorMockitoTest {
 
         List<Position> actual = positionProcessor.findPositions();
 
-        Assert.assertEquals(actual, expected);
+        Assert.assertEquals(expected, actual);
     }
 }

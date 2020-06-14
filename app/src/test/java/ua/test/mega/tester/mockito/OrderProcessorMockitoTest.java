@@ -72,6 +72,6 @@ public class OrderProcessorMockitoTest {
 
         List<Order> actual = orderProcessor.findOrdersForLoffedinUser();
 
-        Assert.assertEquals(actual, expected);
+        Assert.assertEquals(expected, actual);
     }
 }
