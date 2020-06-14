@@ -2,25 +2,16 @@ package ua.test.mega.tester.junit;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
-import ua.test.mega.tester.adapters.LoggedInUserAdapterForSpringSecurity;
+import org.junit.runners.JUnit4;
 import ua.test.mega.tester.adapters.PositionAdapterInMemory;
-import ua.test.mega.tester.adapters.UserAdapterInMemory;
 import ua.test.mega.tester.byCategory.categories.PositionProcessorCategory;
 import ua.test.mega.tester.core.PositionProcessor;
 import ua.test.mega.tester.core.api.LoggedInUserAdapter;
 import ua.test.mega.tester.core.api.PositionAdapter;
-import ua.test.mega.tester.core.api.UserAdapter;
-import ua.test.mega.tester.core.api.model.Currency;
-import ua.test.mega.tester.core.api.model.Order;
-import ua.test.mega.tester.core.api.model.Position;
-import ua.test.mega.tester.core.api.model.Side;
+import ua.test.mega.tester.core.api.model.*;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -29,25 +20,25 @@ import java.util.Collections;
 import java.util.List;
 
 @Category(PositionProcessorCategory.class)
-@RunWith(SpringRunner.class)
+@RunWith(JUnit4.class)
 public class PositionProcessorJunitTest {
-    private static UserAdapter userAdapter;
+
     private PositionProcessor positionProcessor;
     private PositionAdapter positionAdapter;
 
-    @BeforeClass
-    public static void init() {
-        userAdapter = new UserAdapterInMemory();
-    }
-
     @Before
     public void setUp() {
-        LoggedInUserAdapter loggedInUserAdapter = new LoggedInUserAdapterForSpringSecurity(userAdapter);
+        LoggedInUserAdapter loggedInUserAdapter = () -> User.builder()
+                .accountId(1)
+                .username("admin")
+                .password("password")
+                .roles(Collections.singletonList("ADMIN"))
+                .build();
+
         positionAdapter = new PositionAdapterInMemory();
         positionProcessor = new PositionProcessor(loggedInUserAdapter, positionAdapter);
     }
 
-    @WithMockUser(username = "user1")
     @Test
     public void findPositions1() {
         //given
@@ -86,13 +77,6 @@ public class PositionProcessorJunitTest {
         Assert.assertEquals(expected, actual);
     }
 
-    @WithAnonymousUser
-    @Test(expected = NullPointerException.class)
-    public void findPositions2() {
-        positionProcessor.findPositions();
-    }
-
-    @WithMockUser(username = "admin")
     @Test
     public void findPositions3() {
         //when
