@@ -4,9 +4,7 @@ import io.restassured.response.Response;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import java.io.IOException;
+import org.junit.runners.JUnit4;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
@@ -14,7 +12,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 @MegaAdmin
-@RunWith(SpringRunner.class)
+@RunWith(JUnit4.class)
 public class AccountControllerTest {
 
     @BeforeClass
