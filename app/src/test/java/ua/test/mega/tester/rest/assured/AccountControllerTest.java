@@ -8,13 +8,10 @@ import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
 import io.restassured.response.Response;
 import ua.test.mega.tester.MegaAuthRule;
 
-@RunWith(JUnit4.class)
+
 public class AccountControllerTest {
 
 	@Rule
@@ -24,11 +21,9 @@ public class AccountControllerTest {
 	public static void setUp() {
 		baseURI = "http://localhost:8080/api/account/";
 
-		//        TestAnnotationRole annotationRole = new TestAnnotationRole();
-		//        annotationRole.getRole(AccountControllerTest.class);
 	}
 
-	@MegaAdmin(login = "user1", password = "user1")
+	@MegaUser
 	@Test
 	public void shouldShowCurrentUserAccount1() {
 		given()
@@ -44,7 +39,6 @@ public class AccountControllerTest {
 	@MegaAdmin
 	@Test
 	public void shouldShowCurrentUserAccount2() {
-
 		given()
 				.contentType("application/json")
 				.when()
@@ -55,6 +49,7 @@ public class AccountControllerTest {
 				.log().body();
 	}
 
+	@MegaAdmin
 	@Test
 	public void shouldShowUserAccount1() {
 		given()
@@ -67,6 +62,7 @@ public class AccountControllerTest {
 				.log().body();
 	}
 
+	@MegaAdmin
 	@Test
 	public void shouldShowUserAccount2() {
 		given()
@@ -79,11 +75,10 @@ public class AccountControllerTest {
 				.log().body();
 	}
 
-	@MegaAdmin
+	@MegaUser
 	@Test
 	public void shouldAccessDenied() {
 		given()
-				.auth().preemptive().basic("user1", "user1")
 				.contentType("application/json")
 				.when()
 				.get("/2")
@@ -106,13 +101,13 @@ public class AccountControllerTest {
 						.extract()
 						.response();
 
-		assertEquals(response.body().print(), "1000");
+		assertEquals(response.body().print(), "2000");
 	}
 
+	@MegaUser
 	@Test
 	public void shouldAccessDenied2() {
 		given()
-				.auth().preemptive().basic("user1", "user1")
 				.contentType("application/json")
 				.when()
 				.get("/1/deposit/1000")
@@ -121,6 +116,18 @@ public class AccountControllerTest {
 				.log().body();
 	}
 
+	@Test
+	public void shouldBeWithStatus401() {
+		given()
+				.contentType("application/json")
+				.when()
+				.get("/1/deposit/1000")
+				.then()
+				.statusCode(401)
+				.log().body();
+	}
+
+	@MegaAdmin
 	@Test
 	public void shouldWithdrawal() {
 		Response response = given()
@@ -133,13 +140,13 @@ public class AccountControllerTest {
 				.extract()
 				.response();
 
-		assertEquals(response.body().print(), "0");
+		assertEquals(response.body().print(), "1000");
 	}
 
+	@MegaAdmin(login = "123",password ="123" )
 	@Test
 	public void shouldAccessDenied3() {
 		given()
-				.auth().preemptive().basic("123", "123")
 				.contentType("application/json")
 				.when()
 				.get("/1/withdrawal/1000")
